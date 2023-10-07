@@ -151,13 +151,62 @@ FROM table_teacher_subjects
 
 CREATE VIEW view_faculty_subjects AS
 SELECT table_faculty_subjects.id AS id,
-       table_faculties.name AS faculty,
-       table_subjects.name AS subject
+       table_faculties.name      AS faculty,
+       table_subjects.name       AS subject
 FROM table_faculty_subjects
-    JOIN table_faculties 
-        ON table_faculty_subjects.faculty_id = table_faculties.id
-    JOIN table_subjects 
-        ON table_faculty_subjects.subject_id = table_subjects.id;
+         JOIN table_faculties
+              ON table_faculty_subjects.faculty_id = table_faculties.id
+         JOIN table_subjects
+              ON table_faculty_subjects.subject_id = table_subjects.id;
+
+-- Создание процедур
+CREATE PROCEDURE procedure_insert_student(
+    last_name_ TEXT,
+    first_name_ TEXT,
+    patronymic_ TEXT,
+    date_of_birth_ DATE,
+    faculty TEXT)
+    LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    BEGIN
+        IF NOT EXISTS (SELECT id
+                       FROM table_persons
+                       WHERE last_name = last_name_
+                         AND first_name = first_name_
+                         AND patronymic = patronymic_
+                         AND date_of_birth = date_of_birth_) THEN
+            INSERT INTO table_persons (last_name, first_name, patronymic, date_of_birth)
+            VALUES (last_name_, first_name_, patronymic_, date_of_birth_);
+        END IF;
+
+        IF NOT EXISTS (SELECT id
+                       FROM table_faculties
+                       WHERE name = faculty) THEN
+            RAISE EXCEPTION 'Exception';
+            --INSERT INTO table_faculties (name) VALUES (faculty);
+        END IF;
+
+        INSERT INTO table_students (person_id, faculty_id)
+        VALUES ((SELECT id
+                 FROM table_persons
+                 WHERE last_name = last_name_
+                   AND first_name = first_name_
+                   AND patronymic = patronymic_
+                   AND date_of_birth = date_of_birth_),
+                (SELECT id
+                 FROM table_faculties
+                 WHERE name = faculty));
+    EXCEPTION
+        WHEN OTHERS
+            THEN ROLLBACK;
+    END;
+
+    COMMIT;
+END;
+$$;
+--CALL procedure_insert_student('Sidorov', 'Petr', '', '1990-01-01', 'Web2');
 
 -- Заполнение таблиц тестовыми данными
 INSERT INTO test.table_faculties (name)
