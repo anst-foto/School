@@ -15,6 +15,19 @@ CREATE TABLE table_subjects
     name TEXT   NOT NULL
 );
 
+CREATE TABLE table_faculty_subjects
+(
+    id         SERIAL NOT NULL PRIMARY KEY,
+    faculty_id INT    NOT NULL,
+    subject_id INT    NOT NULL,
+    FOREIGN KEY (faculty_id) REFERENCES table_faculties (id)
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    FOREIGN KEY (subject_id) REFERENCES table_subjects (id)
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
+
 CREATE TABLE table_persons
 (
     id            SERIAL NOT NULL PRIMARY KEY,
@@ -136,6 +149,16 @@ FROM table_teacher_subjects
          JOIN table_subjects
               ON table_teacher_subjects.subject_id = table_subjects.id;
 
+CREATE VIEW view_faculty_subjects AS
+SELECT table_faculty_subjects.id AS id,
+       table_faculties.name AS faculty,
+       table_subjects.name AS subject
+FROM table_faculty_subjects
+    JOIN table_faculties 
+        ON table_faculty_subjects.faculty_id = table_faculties.id
+    JOIN table_subjects 
+        ON table_faculty_subjects.subject_id = table_subjects.id;
+
 -- Заполнение таблиц тестовыми данными
 INSERT INTO test.table_faculties (name)
 VALUES ('SoftDev');
@@ -150,6 +173,17 @@ INSERT INTO test.table_subjects (name)
 VALUES ('UI/UX');
 INSERT INTO test.table_subjects (name)
 VALUES ('Photo');
+
+INSERT INTO test.table_faculty_subjects (faculty_id, subject_id)
+VALUES (1, 1);
+INSERT INTO test.table_faculty_subjects (faculty_id, subject_id)
+VALUES (1, 2);
+INSERT INTO test.table_faculty_subjects (faculty_id, subject_id)
+VALUES (1, 3);
+INSERT INTO test.table_faculty_subjects (faculty_id, subject_id)
+VALUES (2, 3);
+INSERT INTO test.table_faculty_subjects (faculty_id, subject_id)
+VALUES (2, 4);
 
 INSERT INTO test.table_persons (last_name, first_name, patronymic, date_of_birth)
 VALUES ('Starinin', 'Andrey', 'Nikolaevich', '1986-02-18');
