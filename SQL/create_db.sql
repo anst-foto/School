@@ -137,3 +137,53 @@ FROM table_teacher_subjects
               ON table_teacher_subjects.subject_id = table_subjects.id;
 
 -- Заполнение таблиц тестовыми данными
+INSERT INTO test.table_faculties (name)
+VALUES ('SoftDev');
+INSERT INTO test.table_faculties (name)
+VALUES ('Design');
+
+INSERT INTO test.table_subjects (name)
+VALUES ('C#');
+INSERT INTO test.table_subjects (name)
+VALUES ('SQL');
+INSERT INTO test.table_subjects (name)
+VALUES ('UI/UX');
+INSERT INTO test.table_subjects (name)
+VALUES ('Photo');
+
+INSERT INTO test.table_persons (last_name, first_name, patronymic, date_of_birth)
+VALUES ('Starinin', 'Andrey', 'Nikolaevich', '1986-02-18');
+INSERT INTO test.table_persons (last_name, first_name, patronymic, date_of_birth)
+VALUES ('Karenina', 'Anna', null, '2000-10-30');
+INSERT INTO test.table_persons (last_name, first_name, patronymic, date_of_birth)
+VALUES ('Susanin', 'Ivan', null, '1995-07-31');
+
+INSERT INTO test.table_teachers (person_id, faculty_id)
+VALUES (1, 1);
+INSERT INTO test.table_teachers (person_id, faculty_id)
+VALUES (2, 2);
+
+INSERT INTO test.table_teacher_subjects (teacher_id, subject_id)
+VALUES (1, 1);
+INSERT INTO test.table_teacher_subjects (teacher_id, subject_id)
+VALUES (1, 2);
+INSERT INTO test.table_teacher_subjects (teacher_id, subject_id)
+VALUES (1, 4);
+INSERT INTO test.table_teacher_subjects (teacher_id, subject_id)
+VALUES (2, 3);
+INSERT INTO test.table_teacher_subjects (teacher_id, subject_id)
+VALUES (2, 4);
+
+INSERT INTO test.table_students (person_id, faculty_id)
+VALUES (2, 2);
+INSERT INTO test.table_students (person_id, faculty_id)
+VALUES (3, 1);
+INSERT INTO test.table_students (person_id, faculty_id, is_active)
+VALUES (1, 1, false);
+
+INSERT INTO test.table_marks (student_id, date, subject_id, mark, teacher_id)
+VALUES (1, '2023-09-05', 4, 5, 1);
+INSERT INTO test.table_marks (student_id, date, subject_id, mark, teacher_id)
+VALUES (2, '2023-09-05', 1, 4, 1);
+INSERT INTO test.table_marks (student_id, subject_id, mark, teacher_id)
+VALUES (2, 3, 2, 2);
