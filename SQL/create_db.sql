@@ -160,6 +160,40 @@ FROM table_faculty_subjects
               ON table_faculty_subjects.subject_id = table_subjects.id;
 
 -- Создание процедур
+CREATE PROCEDURE procedure_insert_person(
+    last_name_ TEXT,
+    first_name_ TEXT,
+    patronymic_ TEXT,
+    date_of_birth_ DATE
+)
+    LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    IF NOT EXISTS (SELECT id
+                   FROM table_persons
+                   WHERE last_name = last_name_
+                     AND first_name = first_name_
+                     AND patronymic = patronymic_
+                     AND date_of_birth = date_of_birth_) THEN
+        INSERT INTO table_persons (last_name, first_name, patronymic, date_of_birth)
+        VALUES (last_name_, first_name_, patronymic_, date_of_birth_);
+    END IF;
+END;
+$$;
+
+CREATE FUNCTION function_check_faculty(faculty TEXT)
+    RETURNS BOOLEAN
+LANGUAGE sql
+AS
+$$
+    SELECT EXISTS (SELECT id
+                       FROM table_faculties
+                       WHERE name = faculty);
+$$;
+--SELECT function_check_faculty('WEb3');
+
+
 CREATE PROCEDURE procedure_insert_student(
     last_name_ TEXT,
     first_name_ TEXT,
@@ -171,21 +205,10 @@ AS
 $$
 BEGIN
     BEGIN
-        IF NOT EXISTS (SELECT id
-                       FROM table_persons
-                       WHERE last_name = last_name_
-                         AND first_name = first_name_
-                         AND patronymic = patronymic_
-                         AND date_of_birth = date_of_birth_) THEN
-            INSERT INTO table_persons (last_name, first_name, patronymic, date_of_birth)
-            VALUES (last_name_, first_name_, patronymic_, date_of_birth_);
-        END IF;
+        CALL procedure_insert_person(last_name_, first_name_, patronymic_, date_of_birth_);
 
-        IF NOT EXISTS (SELECT id
-                       FROM table_faculties
-                       WHERE name = faculty) THEN
-            RAISE EXCEPTION 'Exception';
-            --INSERT INTO table_faculties (name) VALUES (faculty);
+        IF NOT function_check_faculty(faculty) 
+            THEN RAISE EXCEPTION 'Exception';            
         END IF;
 
         INSERT INTO table_students (person_id, faculty_id)
@@ -206,7 +229,7 @@ BEGIN
     COMMIT;
 END;
 $$;
---CALL procedure_insert_student('Sidorov', 'Petr', '', '1990-01-01', 'Web2');
+CALL procedure_insert_student('Petrov', 'Petr', '', '1990-01-01', 'Dev');
 
 -- Заполнение таблиц тестовыми данными
 INSERT INTO test.table_faculties (name)
